@@ -1,0 +1,34 @@
+service: ${env:SERVICE} 
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+functions:
+  upload-to-s3:
+    handler: src/handler.upload
+    role: ${env:IAM_ROLE}
+    events:
+      - http:
+          method: post
+          path: upload
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+useDotenv: true
+
+resources:
+  Resources:
+    ImageBucket:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: ${env:BUCKET_NAME}
+
+    destinationBucket:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: ${env:DESTINATION_BUCKET}
